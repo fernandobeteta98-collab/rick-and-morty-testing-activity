@@ -1,37 +1,20 @@
-import { Character, CharacterResponse, Episode } from '@/types/rickandmorty';
+export async function getCharacters(page: number = 1, name: string = '', status: string = '') {
+  const params = new URLSearchParams();
+  if (page) params.append('page', page.toString());
+  if (name) params.append('name', name);
+  if (status) params.append('status', status);
 
-const API_BASE_URL = 'https://rickandmortyapi.com/api';
-
-export async function getCharacters(page: number = 1): Promise<CharacterResponse> {
-  const res = await fetch(`${API_BASE_URL}/character?page=${page}`);
-  
+  const res = await fetch(`https://rickandmortyapi.com/api/character/?${params.toString()}`);
   if (!res.ok) {
     throw new Error('Failed to fetch characters');
   }
-
   return res.json();
 }
 
-export async function getCharacter(id: string): Promise<Character> {
-  const res = await fetch(`${API_BASE_URL}/character/${id}`);
-  
+export async function getCharacterById(id: string | number) {
+  const res = await fetch(`https://rickandmortyapi.com/api/character/${id}`);
   if (!res.ok) {
     throw new Error('Failed to fetch character details');
   }
-
   return res.json();
-}
-
-export async function getEpisodes(ids: string[]): Promise<Episode[]> {
-  if (ids.length === 0) return [];
-  
-  const res = await fetch(`${API_BASE_URL}/episode/${ids.join(',')}`);
-  
-  if (!res.ok) {
-    throw new Error('Failed to fetch episodes');
-  }
-
-  const data = await res.json();
-  // If only one episode is requested, the API returns an object, not an array.
-  return Array.isArray(data) ? data : [data];
 }
